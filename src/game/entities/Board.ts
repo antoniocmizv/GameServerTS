@@ -5,6 +5,7 @@ export interface Element {
 }
 
 export interface Board {
+    type: string;
     size: number;
     elements: Array<Element>;
 }

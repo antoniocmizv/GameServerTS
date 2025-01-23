@@ -78,6 +78,7 @@ export class GameService {
             state: game.state,
             room: game.room,
             board: {
+                type: game.board.type,
                 size: game.board.size,
                 elements: game.board.elements.map(element => ({
                     x: element.x,

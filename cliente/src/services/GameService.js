@@ -1,34 +1,33 @@
 import { Board } from "../entities/Board.js";
-const States = {
-    WAITING: 0,
-    PLAYING: 1,
-    FINISHED: 2
-};
-export const GameService = {
-        States,
-        state: States.WAITING,
-        players: [],
-        board: null,
-        action: (message) => {
-            switch (message.action) {
-                case "start":
-                    GameService.state = GameService.States.PLAYING;
-                    
-                    console.log("Game started");
-                    //arranco el tablero
-                    Board.init();
-                    break;
-                case "end":
-                    GameService.state = GameService.States.FINISHED;
-                    console.log("Game finished");
-                break;
-            case "update":
-                GameService.players = message.players;
-                break;
-            case "board":
-                GameService.board = message.board;
-                break;
-        }
-
+import { Player } from "../entities/Player.js";
+import { PrintInterface } from "../interfaces/PrintInterface.js";
+export class GameService {
+    #states = {
+        WAITING : 0,
+        PLAYING : 1,
+        ENDED : 2
+    };
+    #players = [];
+    #board = null;
+    #state = null;
+    #actionsList = {
+        "NEW_PLAYER" : this.do_newPlayer,
+        "board" : this.do_start,
+    };
+    constructor(){
+        this.#state = this.#states.WAITING
     }
+    do (data) {
+        this.#actionsList[data.type](data.content)
+    };
+    do_newPlayer (content) {
+        console.log("ha llegado un jugador nuevo");
+    };
+    do_start (content) {
+        console.log(content);
+        console.log("ha llegado un start");
+        PrintInterface.printInterface(content);
+    };
+    
 }
+

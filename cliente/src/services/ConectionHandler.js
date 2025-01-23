@@ -5,12 +5,16 @@ export const ConnectionHandler = {
     connected: false,
     socket: null,
     url: null,
+    gameService : new GameService(),
     init: ( url, onConnectedCallback, onDisconnectedCallback) => {
         ConnectionHandler.socket = io(url);
         ConnectionHandler.socket.on("connect", (data) => {
             ConnectionHandler.connected = true;
             console.log(data);
             onConnectedCallback();
+
+            
+
             ConnectionHandler.socket.on("gameStart", (data) => {
                 console.log(data);
                 GameService.action({action: "start"});
@@ -26,8 +30,7 @@ export const ConnectionHandler = {
             });
             ConnectionHandler.socket.on("board", (data) => {
                 console.log(data);
-                PrintInterface.printInterface(data);
-
+                ConnectionHandler.gameService.do(data);
             });
         });
        
