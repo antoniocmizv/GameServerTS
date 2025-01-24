@@ -14,6 +14,7 @@ export class GameService {
     #actionsList = {
         "NEW_PLAYER": this.do_newPlayer,
         "board": this.do_start,
+        "gameStart": this.do_gameStart
     };
 
     constructor() {

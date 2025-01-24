@@ -10,51 +10,59 @@ export class Board {
         this.elements.push(element);
     }
 
-    print() {
+        // Modificar el método print() para incluir jugadores
+    print(players = []) {
         const size = this.size;
-        const bushs = this.elements;
-
-        // Crear tablero vacío
         let board = Array(size).fill().map(() => Array(size).fill(0));
-
-        // Colocar barcos
-        bushs.forEach(bush => {
+    
+        // Colocar arbustos
+        this.elements.forEach(bush => {
             board[bush.x][bush.y] = 1;
         });
-
-        // Construir string para imprimir
+    
+        // Colocar jugadores
+        players.forEach(player => {
+            if (player.visibility) {
+                board[player.x][player.y] = 2; // 2 representa jugador
+            }
+        });
+    
+        // Construir string
         let boardString = "";
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 if (board[i][j] === 1) {
-                    boardString += "X ";
+                    boardString += "🌳"; // Arbusto
+                } else if (board[i][j] === 2) {
+                    boardString += "👤"; // Jugador
                 } else {
-                    boardString += "0 ";
+                    boardString += "⬜"; // Celda vacía
                 }
             }
             boardString += "\n";
         }
         console.log(boardString);
     }
-
-    // Implementar la función para imprimir el tablero en el html
-    printInHtml() {
+    
+    // Modificar printInHtml para incluir jugadores y controles
+    printInHtml(players = []) {
         const size = this.size;
-        const bushs = this.elements;
-
-        // Crear tablero vacío
         let board = Array(size).fill().map(() => Array(size).fill(0));
-
-        // Colocar barcos
-        bushs.forEach(bush => {
+    
+        this.elements.forEach(bush => {
             board[bush.x][bush.y] = 1;
         });
-
-        // Obtener el contenedor del tablero en el HTML
+    
+        players.forEach(player => {
+            if (player.visibility) {
+                board[player.x][player.y] = 2;
+            }
+        });
+    
         const boardContainer = document.getElementById('board-container');
-        boardContainer.innerHTML = ''; // Limpiar el contenedor
-
-        // Construir el tablero en el HTML
+        boardContainer.innerHTML = '';
+    
+        // Agregar tablero
         for (let i = 0; i < size; i++) {
             const row = document.createElement('div');
             row.className = 'board-row';
@@ -63,10 +71,24 @@ export class Board {
                 cell.className = 'board-cell';
                 if (board[i][j] === 1) {
                     cell.classList.add('bush');
+                } else if (board[i][j] === 2) {
+                    cell.classList.add('player');
                 }
                 row.appendChild(cell);
             }
             boardContainer.appendChild(row);
         }
+    
+        // Agregar controles
+        const controls = document.createElement('div');
+        controls.className = 'controls';
+        controls.innerHTML = `
+            <button id="up">↑</button>
+            <button id="left">←</button>
+            <button id="right">→</button>
+            <button id="down">↓</button>
+            <button id="hide">Esconderse</button>
+        `;
+        boardContainer.appendChild(controls);
     }
 }

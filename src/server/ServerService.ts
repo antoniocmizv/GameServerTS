@@ -56,7 +56,7 @@ export class ServerService {
         const board = new BoardBuilder().serializeBoard();
         this.io?.to(room.toString()).emit('board', board);
         
-
+        
     }
 
     public isActive() {
