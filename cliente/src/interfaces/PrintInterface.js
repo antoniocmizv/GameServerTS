@@ -1,5 +1,5 @@
 
-export const PrintInterface = {
+export const    PrintInterface = {
     printInterface: (data) => {
         const size = data.size;
         const bushs = data.elements;
@@ -7,7 +7,7 @@ export const PrintInterface = {
         // Crear tablero vacío
         let board = Array(size).fill().map(() => Array(size).fill(0));
         
-        // Colocar barcos
+        // Colocar arbustos
         bushs.forEach(bush => {
             board[bush.x][bush.y] = 1;
         });

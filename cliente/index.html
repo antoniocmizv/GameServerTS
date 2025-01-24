@@ -6,8 +6,24 @@
     <title>Document</title>
 </head>
 <body>
-    
+<div id="board-container"></div>
 
-    <script type="module" src="./src/index.js"></script>
+<style>
+    .board-row {
+        display: flex;
+    }
+
+    .board-cell {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+    }
+
+    .board-cell.bush {
+        background-color: green;
+    }
+</style>
+
+<script type="module" src="./src/index.js"></script>
 </body>
 </html>
