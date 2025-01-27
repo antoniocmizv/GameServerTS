@@ -10,23 +10,24 @@ export class Board {
         this.elements.push(element);
     }
 
-        // Modificar el método print() para incluir jugadores
-    print(players = []) {
+    // Modificar el método print() para incluir jugadores
+    print(players = []){
         const size = this.size;
         let board = Array(size).fill().map(() => Array(size).fill(0));
-    
+
+        console.log(this.elements);
         // Colocar arbustos
         this.elements.forEach(bush => {
             board[bush.x][bush.y] = 1;
         });
-    
+
         // Colocar jugadores
         players.forEach(player => {
             if (player.visibility) {
                 board[player.x][player.y] = 2; // 2 representa jugador
             }
         });
-    
+
         // Construir string
         let boardString = "";
         for (let i = 0; i < size; i++) {
@@ -43,25 +44,25 @@ export class Board {
         }
         console.log(boardString);
     }
-    
+
     // Modificar printInHtml para incluir jugadores y controles
     printInHtml(players = []) {
         const size = this.size;
         let board = Array(size).fill().map(() => Array(size).fill(0));
-    
+
         this.elements.forEach(bush => {
             board[bush.x][bush.y] = 1;
         });
-    
+
         players.forEach(player => {
             if (player.visibility) {
                 board[player.x][player.y] = 2;
             }
         });
-    
+
         const boardContainer = document.getElementById('board-container');
         boardContainer.innerHTML = '';
-    
+
         // Agregar tablero
         for (let i = 0; i < size; i++) {
             const row = document.createElement('div');
@@ -78,7 +79,7 @@ export class Board {
             }
             boardContainer.appendChild(row);
         }
-    
+
         // Agregar controles
         const controls = document.createElement('div');
         controls.className = 'controls';
@@ -90,5 +91,7 @@ export class Board {
             <button id="hide">Esconderse</button>
         `;
         boardContainer.appendChild(controls);
+        
+
     }
 }

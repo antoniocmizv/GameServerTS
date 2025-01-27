@@ -2,6 +2,7 @@ import { io } from "../../node_modules/socket.io-client/dist/socket.io.esm.min.j
 import { GameService } from "./GameService.js";
 import { PrintInterface } from "../interfaces/PrintInterface.js";
 export const ConnectionHandler = {
+    
     connected: false,
     socket: null,
     url: null,
@@ -12,9 +13,6 @@ export const ConnectionHandler = {
             ConnectionHandler.connected = true;
             console.log(data);
             onConnectedCallback();
-
-            
-
             ConnectionHandler.socket.on("gameStart", (data) => {
                 console.log(data);
                 GameService.action({action: "start"});
@@ -26,6 +24,7 @@ export const ConnectionHandler = {
             });
             ConnectionHandler.socket.on("message", (data) => {
                 console.log(data);
+                ConnectionHandler.gameService.do(data);
                 
             });
             ConnectionHandler.socket.on("board", (data) => {
@@ -39,7 +38,7 @@ export const ConnectionHandler = {
             onDisconnectedCallback();
             
         });
-       
+
     }
 
 }

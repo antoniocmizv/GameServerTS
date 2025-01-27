@@ -1,6 +1,6 @@
-import {Board} from "../entities/Board.js";
-import {Player} from "../entities/Player.js";
-import {PrintInterface} from "../interfaces/PrintInterface.js";
+import { Board } from "../entities/Board.js";
+import { Player } from "../entities/Player.js";
+import { PrintInterface } from "../interfaces/PrintInterface.js";
 
 export class GameService {
     #states = {
@@ -11,14 +11,17 @@ export class GameService {
     #players = [];
     #board = null;
     #state = null;
-    #actionsList = {
-        "NEW_PLAYER": this.do_newPlayer,
-        "board": this.do_start,
-        "gameStart": this.do_gameStart
-    };
+    #actionsList = {};
 
     constructor() {
         this.#state = this.#states.WAITING
+        this.#players = [];
+        this.#actionsList = {
+            "NEW_PLAYER": (content) => this.do_newPlayer(content),
+            "board": (content) => this.do_start(content),
+            "game": (content) => this.do_gameStart(content),
+           
+        };
     }
 
     do(data) {
@@ -38,7 +41,16 @@ export class GameService {
         boardInstance.printInHtml();
     };
 
-
-
+    do_gameStart(content) {
+        console.log("Iniciando juego con estado:", content);
+        const boardInstance = new Board(content.board);
+        // Almacenar jugadores en el servicio
+        this.#players = content.room.players;
+        // Pintar tablero con jugadores
+        boardInstance.print(this.#players);
+        boardInstance.printInHtml(this.#players);
+    };
+    
+    
 }
 

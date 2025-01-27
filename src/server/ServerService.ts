@@ -38,11 +38,12 @@ export class ServerService {
         this.io.on('connection', (socket) => {
             socket.emit("connectionStatus", { status: true });
             console.log('Un cliente se ha conectado:', socket.id);
-            GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket));
+            GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket,10));
             
             socket.on('disconnect', () => {
                 console.log('Un cliente se ha desconectado:', socket.id);
             });
+            
         });
     }
 
@@ -54,8 +55,8 @@ export class ServerService {
         console.log("Game started");
         //enviar a los jugadores el mensaje de inicio de juego con el tablero
         const board = new BoardBuilder().serializeBoard();
+        console.log(board);
         this.io?.to(room.toString()).emit('board', board);
-        
         
     }
 
@@ -66,7 +67,8 @@ export class ServerService {
     //mandar un mensaje a todos los jugadores de una sala, a la función le llega el id de la sala y el mensaje
     public sendMessageToRoom(room: String, message: String) {
         this.io?.to(room.toString()).emit('message', message);
-
-
     }
+
+
+    
 }
