@@ -1,3 +1,4 @@
+import { Socket } from "socket.io";
 import { Player } from "../player/entities/Player";
 import { ServerService } from "../server/ServerService";
 import { Room, RoomConfig } from "./entities/Room";
@@ -17,7 +18,7 @@ export class RoomService {
         return this.instance;
     }
 
-    private getRoom() : Room {
+    private getRoom(): Room {
         const room = this.rooms.find((item) => item.occupied == false);
         if (room == undefined) {
             const genRanHex = (size: Number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -33,14 +34,28 @@ export class RoomService {
         return room;
     }
 
-    public addPlayer(player: Player) : Room {
-        const room : Room = this.getRoom();
+    public addPlayer(player: Player): Room {
+        const room: Room = this.getRoom();
         room.players.push(player);
         console.log("Player added to room, Players: ", room.players.length);
-        ServerService.getInstance().addPlayerToRoom(player.id,room.name);
+        ServerService.getInstance().addPlayerToRoom(player.id, room.name);
         if (room.players.length == RoomConfig.maxRoomPlayers) room.occupied = true;
-        return room;  
+        return room;
+    }
+    public getRoomByPlayerId(id: String): Room | null {
+       
+        const roomOfPlayer = this.rooms.find((room) => room.players.find((player) => player.id.id == id));
+        if (roomOfPlayer) return roomOfPlayer;
+        
+       
+
+        // this.rooms.forEach((room) => {
+        //     console.log(id);
+        //     console.log(room);
+
+        // });
+        console.log("Room not found");
+        return null;
     }
 
-    
 }

@@ -1,4 +1,5 @@
 import { PrintInterface } from "../interfaces/PrintInterface.js";
+import { ConnectionHandler } from "../services/ConectionHandler.js";
 
 export class Board {
     constructor(data,player) {
@@ -101,30 +102,37 @@ export class Board {
         document.getElementById('up').addEventListener('click', () => {
            // PrintInterface.print('up');
            console.log("El jugador "+this.player+" se ha movido hacia arriba");
+           ConnectionHandler.socket.emit("movePlayer", { direction: "up", playerId: this.player });
         });
         document.getElementById('left').addEventListener('click', () => {
             //PrintInterface.print('left');
             console.log("El jugador "+this.player+" se ha movido hacia la izquierda");
+            ConnectionHandler.socket.emit("movePlayer", { direction: "left", playerId: this.player });
         });
         document.getElementById('right').addEventListener('click', () => {
             //PrintInterface.print('right');
             console.log("El jugador "+this.player+" se ha movido hacia la derecha");
+            ConnectionHandler.socket.emit("movePlayer", { direction: "right", playerId: this.player });
         });
         document.getElementById('down').addEventListener('click', () => {
            // PrintInterface.print('down');
               console.log("El jugador "+this.player+" se ha movido hacia abajo");
+                ConnectionHandler.socket.emit("movePlayer", { direction: "down", playerId: this.player });
         });
         document.getElementById('shoot').addEventListener('click', () => {
             //PrintInterface.print('shoot');
             console.log("El jugador "+this.player+" ha disparado");
+            ConnectionHandler.socket.emit("shoot", { playerId: this.player });
         });
         document.getElementById('rotate-left').addEventListener('click', () => {
             //PrintInterface.print('rotate-left');
             console.log("El jugador "+this.player+" ha rotado a la izquierda");
+            ConnectionHandler.socket.emit("rotatePlayer", { direction: "left", playerId: this.player });
         });
         document.getElementById('rotate-right').addEventListener('click', () => {
            // PrintInterface.print('rotate-right');
             console.log("El jugador "+this.player+" ha rotado a la derecha");
+            ConnectionHandler.socket.emit("rotatePlayer", { direction: "right", playerId: this.player });
         });
 
 

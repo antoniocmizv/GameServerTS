@@ -1,4 +1,5 @@
 import { Socket } from "socket.io";
+import { serialize } from "v8";
 
 export enum Directions {
     Up = "up", 
@@ -14,9 +15,13 @@ export enum PlayerStates {
 
 export interface Player {
     id: Socket;
-    x: Number;
-    y: Number;
+    x: number;
+    y: number;
     state: PlayerStates;
     direction: Directions;
     visibility: Boolean;
+
 }
+
+
+

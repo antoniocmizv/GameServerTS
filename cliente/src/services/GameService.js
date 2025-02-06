@@ -1,6 +1,7 @@
 import { Board } from "../entities/Board.js";
 import { Player } from "../entities/Player.js";
 import { PrintInterface } from "../interfaces/PrintInterface.js";
+import { ConnectionHandler } from "./ConectionHandler.js";
 
 export class GameService {
     #states = {

@@ -50,6 +50,22 @@ export class ServerService {
                 console.log('Un cliente se ha desconectado:', socket.id);
             });
 
+            socket.on("movePlayer", (data) => {
+                // GameService.getInstance().movePlayer(socket, data);
+               console.log("Move player", data);
+            
+               GameService.getInstance().movePlayer( data);
+            });
+
+            socket.on("shoot", (data) => {
+                console.log("Shoot", data);
+            });
+
+            socket.on("rotatePlayer", (data) => {
+                console.log("Rotate player", data);
+            });
+
+
         });
     }
 

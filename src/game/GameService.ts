@@ -87,7 +87,7 @@ export class GameService {
                     ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
                     console.log(JSON.stringify(this.serializeGame(room.game)));
 
-                    
+
 
 
                 }
@@ -96,6 +96,68 @@ export class GameService {
         }
 
         return false;
+    }
+
+    public movePlayer(data: any) {
+        const room = RoomService.getInstance().getRoomByPlayerId(data.playerId);
+        console.log("Room: ", room?.name);
+        //consigo el jugador de la sala
+        const player = room?.players.find((player) => player.id.id == data.playerId);
+        console.log("Player: ", player?.id.id);
+        //cambio la posición del jugador haciendo un switch de la dirección
+        if (player != undefined ) {
+            switch (data.direction) {
+                case "up":
+                    console.log(player?.y);
+                    console.log("Move up");
+                    player.x = player.x - 1;
+                    console.log(player?.y);
+                    //mando al cliente la nueva posición del jugador
+                    if(room != undefined && room.game != undefined)
+                    ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+                    break;
+                case "down":
+                    console.log(player?.y);
+                    console.log("Move down");
+                    player.x = player.x + 1;
+                    console.log(player?.y);
+                    if(room != undefined && room.game != undefined)
+                    ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+                    break;
+                case "left":
+                    console.log(player?.x);
+                    console.log("Move left");
+                    player.y = player.y - 1;
+                    console.log(player?.x);
+                    if(room != undefined && room.game != undefined)
+                    ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+                    break;
+                case "right":
+                    console.log(player?.x);
+                    console.log("Move right");
+                    player.y = player.y + 1;
+                    console.log(player?.x);
+                    if(room != undefined && room.game != undefined)
+                    ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+                    break;
+
+
+            }
+        }
+
+        // switch (data.direction) {
+        //     case "up":
+        //         console.log(player?.y);
+        //         console.log("Move up");
+        //         if (player != undefined) {
+        //             player.y = 2;
+        //         }
+        //         console.log(player?.y);
+
+
+        // }
+
+
     }
 
 
