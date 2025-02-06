@@ -7,7 +7,7 @@ import { Room } from '../room/entities/Room';
 
 export class ServerService {
     private io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> | null;
-    private active : boolean;
+    private active: boolean;
     private messages = [
         ""
     ]
@@ -36,18 +36,24 @@ export class ServerService {
         this.active = true;
 
         this.io.on('connection', (socket) => {
-            socket.emit("connectionStatus", { status: true });
+            socket.emit("connectionStatus", {
+                status: true,
+                message: {
+                    conexion: "Conexión establecida",
+                    jugador : socket.id
+                }
+            });
             console.log('Un cliente se ha conectado:', socket.id);
-            GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket,10));
-            
+            GameService.getInstance().addPlayer(GameService.getInstance().buildPlayer(socket, 10));
+
             socket.on('disconnect', () => {
                 console.log('Un cliente se ha desconectado:', socket.id);
             });
-            
+
         });
     }
 
-    public addPlayerToRoom(player : Socket, room: String) {
+    public addPlayerToRoom(player: Socket, room: String) {
         player.join(room.toString());
     }
 
@@ -57,7 +63,7 @@ export class ServerService {
         const board = new BoardBuilder().serializeBoard();
         console.log(board);
         this.io?.to(room.toString()).emit('board', board);
-        
+
     }
 
     public isActive() {
@@ -70,5 +76,5 @@ export class ServerService {
     }
 
 
-    
+
 }

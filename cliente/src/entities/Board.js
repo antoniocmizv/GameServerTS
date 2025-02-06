@@ -1,9 +1,11 @@
 import { PrintInterface } from "../interfaces/PrintInterface.js";
 
 export class Board {
-    constructor(data) {
+    constructor(data,player) {
         this.size = data.size;
         this.elements = data.elements;
+        this.player = player;
+        console.log("soy el jugador desde board "+ this.player);
     }
 
     addElement(element) {
@@ -12,6 +14,7 @@ export class Board {
 
     // Modificar el método print() para incluir jugadores
     print(players = []){
+        console.log("soy el jugador "+this.player);
         const size = this.size;
         let board = Array(size).fill().map(() => Array(size).fill(0));
 
@@ -88,9 +91,43 @@ export class Board {
             <button id="left">←</button>
             <button id="right">→</button>
             <button id="down">↓</button>
-            <button id="hide">Esconderse</button>
+            <button id="rotate-left">↺</button>
+            <button id="rotate-right">↻</button>
+            <button id="shoot">Disparar</button>
         `;
         boardContainer.appendChild(controls);
+
+        // Agrego listener a los botones
+        document.getElementById('up').addEventListener('click', () => {
+           // PrintInterface.print('up');
+           console.log("El jugador "+this.player+" se ha movido hacia arriba");
+        });
+        document.getElementById('left').addEventListener('click', () => {
+            //PrintInterface.print('left');
+            console.log("El jugador "+this.player+" se ha movido hacia la izquierda");
+        });
+        document.getElementById('right').addEventListener('click', () => {
+            //PrintInterface.print('right');
+            console.log("El jugador "+this.player+" se ha movido hacia la derecha");
+        });
+        document.getElementById('down').addEventListener('click', () => {
+           // PrintInterface.print('down');
+              console.log("El jugador "+this.player+" se ha movido hacia abajo");
+        });
+        document.getElementById('shoot').addEventListener('click', () => {
+            //PrintInterface.print('shoot');
+            console.log("El jugador "+this.player+" ha disparado");
+        });
+        document.getElementById('rotate-left').addEventListener('click', () => {
+            //PrintInterface.print('rotate-left');
+            console.log("El jugador "+this.player+" ha rotado a la izquierda");
+        });
+        document.getElementById('rotate-right').addEventListener('click', () => {
+           // PrintInterface.print('rotate-right');
+            console.log("El jugador "+this.player+" ha rotado a la derecha");
+        });
+
+
         
 
     }
