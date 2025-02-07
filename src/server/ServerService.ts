@@ -40,7 +40,7 @@ export class ServerService {
                 status: true,
                 message: {
                     conexion: "Conexión establecida",
-                    jugador : socket.id
+                    jugador: socket.id
                 }
             });
             console.log('Un cliente se ha conectado:', socket.id);
@@ -52,14 +52,15 @@ export class ServerService {
 
             socket.on("movePlayer", (data) => {
                 // GameService.getInstance().movePlayer(socket, data);
-               console.log("Move player", data);
-            
-               GameService.getInstance().movePlayer( data);
+                console.log("Move player", data);
+
+                GameService.getInstance().movePlayer(data);
             });
 
 
             socket.on("shoot", (data) => {
                 console.log("Shoot", data);
+                GameService.getInstance().shootPlayer(data);
             });
 
             socket.on("rotatePlayer", (data) => {

@@ -22,7 +22,7 @@ export class GameService {
             "NEW_PLAYER": (content) => this.do_newPlayer(content),
             "board": (content) => this.do_start(content),
             "game": (content) => this.do_gameStart(content),
-           
+
         };
     }
 
@@ -43,7 +43,7 @@ export class GameService {
         console.log(content);
         console.log("ha llegado un start");
         // Genero un nuevo tablero con los datos que llegan y lo imprimo
-        console.log("soy el jugador desde el gameService "+ this.#player);
+        console.log("soy el jugador desde el gameService " + this.#player);
         const boardInstance = new Board(content, this.#player);
         boardInstance.print();
         boardInstance.printInHtml();
@@ -52,22 +52,31 @@ export class GameService {
     do_gameStart(content) {
         console.log("Iniciando juego con estado:", content);
         const boardInstance = new Board(content.board, this.#player);
-        // Almacenar jugadores en el servicio
-        this.#players = content.room.players;
-        // Pintar tablero con jugadores
-        boardInstance.print(this.#players);
-        boardInstance.printInHtml(this.#players);
-    };
+        // Filtrar jugadores vivos
+        const alivePlayers = content.room.players.filter(player => player.state !== 4);
 
-  
+        // Actualizar la lista de jugadores en el servicio
+        this.#players = alivePlayers;
+
+        // Si el jugador actual está muerto, se puede ocultar la interfaz o notificar el fin
+        if (!alivePlayers.find(p => p.socketId === this.#player)) {
+            PrintInterface.showGameOver(); // Por ejemplo, mostrando un mensaje de "Game Over"
+            return;
+        }
+
+        boardInstance.print(alivePlayers);
+        boardInstance.printInHtml(alivePlayers);
+    }
 
 
-    
 
 
 
 
-    
-    
+
+
+
+
+
 }
 

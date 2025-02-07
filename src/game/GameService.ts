@@ -104,32 +104,43 @@ export class GameService {
         if (!room || !room.game) return;
 
         const boardSize = room.game.board.size;
-        const player = room.players.find((p) => p.id.id == data.playerId);
+        const player = room.players.find((p) => p.id.id === data.playerId);
         if (!player) return;
 
-        switch (data.direction) {
-            case "up":
-                if (player.x > 0) {
-                    player.x--;
-                }
-                break;
-            case "down":
-                if (player.x < boardSize - 1) {
-                    player.x++;
-                }
-                break;
-            case "left":
-                if (player.y > 0) {
-                    player.y--;
-                }
-                break;
-            case "right":
-                if (player.y < boardSize - 1) {
-                    player.y++;
-                }
-                break;
-            default:
-                break;
+        let newX = player.x;
+        let newY = player.y;
+
+        if (data.direction === "advance") {
+            // Calcular nueva posición según la dirección actual
+            switch (player.direction) {
+                case Directions.Up:
+                    newX = player.x - 1;
+                    break;
+                case Directions.Right:
+                    newY = player.y + 1;
+                    break;
+                case Directions.Down:
+                    newX = player.x + 1;
+                    break;
+                case Directions.Left:
+                    newY = player.y - 1;
+                    break;
+            }
+
+            // Validar límites del tablero
+            if (newX < 0 || newX >= boardSize || newY < 0 || newY >= boardSize) {
+                return; // Impedir moverse fuera del mapa
+            }
+
+            // Comprobar que ningún otro jugador ya ocupa la casilla destino
+            const occupied = room.players.some(p => p.id.id !== data.playerId && p.x === newX && p.y === newY);
+            if (occupied) {
+                return; // No se mueve si la casilla está ocupada
+            }
+
+            // Actualizar posición si todo es correcto
+            player.x = newX;
+            player.y = newY;
         }
 
         ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
@@ -142,25 +153,55 @@ export class GameService {
         const player = room.players.find((p) => p.id.id == data.playerId);
         if (!player) return;
 
-        // Secuencia de direcciones en el orden: up -> right -> down -> left
+        // Rotar solo en sentido horario (derecha)
         const dirOrder = [Directions.Up, Directions.Right, Directions.Down, Directions.Left];
         const currentIndex = dirOrder.indexOf(player.direction);
+        const newIndex = (currentIndex + 1) % dirOrder.length;
+        player.direction = dirOrder[newIndex];
 
-        switch (data.direction) {
-            case "left": {
-                const newIndex = (currentIndex + dirOrder.length - 1) % dirOrder.length;
-                player.direction = dirOrder[newIndex];
+        ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+    }
+
+    public shootPlayer(data: any) {
+        const room = RoomService.getInstance().getRoomByPlayerId(data.playerId);
+        if (!room || !room.game) return;
+
+        const boardSize = room.game.board.size;
+        const shooter = room.players.find(p => p.id.id === data.playerId);
+        if (!shooter) return;
+
+        // Calcular la casilla objetivo en base a la dirección del jugador que dispara
+        let targetX = shooter.x;
+        let targetY = shooter.y;
+        switch (shooter.direction) {
+            case Directions.Up:
+                targetX = shooter.x - 1;
                 break;
-            }
-            case "right": {
-                const newIndex = (currentIndex + 1) % dirOrder.length;
-                player.direction = dirOrder[newIndex];
+            case Directions.Right:
+                targetY = shooter.y + 1;
                 break;
-            }
-            default:
+            case Directions.Down:
+                targetX = shooter.x + 1;
+                break;
+            case Directions.Left:
+                targetY = shooter.y - 1;
                 break;
         }
 
+        // Validar que el objetivo esté dentro del mapa
+        if (targetX < 0 || targetX >= boardSize || targetY < 0 || targetY >= boardSize) {
+            return;
+        }
+
+        // Buscar si hay algún jugador en la casilla objetivo
+        const targetPlayer = room.players.find(p => p.x === targetX && p.y === targetY);
+        if (targetPlayer) {
+            // Si se detecta un jugador, se lo "mata" actualizando su estado
+            targetPlayer.state = PlayerStates.Dead;
+            console.log(`Jugador ${targetPlayer.id.id} fue eliminado por ${shooter.id.id}`);
+        }
+
+        // Notificar a todos los jugadores en la sala con la actualización del juego
         ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
     }
 

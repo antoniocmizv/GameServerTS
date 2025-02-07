@@ -95,57 +95,31 @@ export class Board {
         }
 
         // Agregar controles
+               // Dentro de printInHtml() reemplaza el contenido de controls:
         const controls = document.createElement('div');
         controls.className = 'controls';
         controls.innerHTML = `
-            <button id="up">↑</button>
-            <button id="left">←</button>
-            <button id="right">→</button>
-            <button id="down">↓</button>
-            <button id="rotate-left">↺</button>
-            <button id="rotate-right">↻</button>
+            <button id="advance">Avanzar</button>
+            <button id="rotate">Rotar</button>
             <button id="shoot">Disparar</button>
         `;
         boardContainer.appendChild(controls);
-
-        // Agrego listener a los botones
-        document.getElementById('up').addEventListener('click', () => {
-           // PrintInterface.print('up');
-           console.log("El jugador "+this.player+" se ha movido hacia arriba");
-           ConnectionHandler.socket.emit("movePlayer", { direction: "up", playerId: this.player });
+        
+        // Agrego listener a los nuevos botones
+        document.getElementById('advance').addEventListener('click', () => {
+            console.log("El jugador " + this.player + " avanza");
+            // Emitir "movePlayer" con acción "advance"
+            ConnectionHandler.socket.emit("movePlayer", { direction: "advance", playerId: this.player });
         });
-        document.getElementById('left').addEventListener('click', () => {
-            //PrintInterface.print('left');
-            console.log("El jugador "+this.player+" se ha movido hacia la izquierda");
-            ConnectionHandler.socket.emit("movePlayer", { direction: "left", playerId: this.player });
-        });
-        document.getElementById('right').addEventListener('click', () => {
-            //PrintInterface.print('right');
-            console.log("El jugador "+this.player+" se ha movido hacia la derecha");
-            ConnectionHandler.socket.emit("movePlayer", { direction: "right", playerId: this.player });
-        });
-        document.getElementById('down').addEventListener('click', () => {
-           // PrintInterface.print('down');
-              console.log("El jugador "+this.player+" se ha movido hacia abajo");
-                ConnectionHandler.socket.emit("movePlayer", { direction: "down", playerId: this.player });
-        });
-        document.getElementById('shoot').addEventListener('click', () => {
-            //PrintInterface.print('shoot');
-            console.log("El jugador "+this.player+" ha disparado");
-            ConnectionHandler.socket.emit("shoot", { playerId: this.player });
-        });
-        document.getElementById('rotate-left').addEventListener('click', () => {
-            //PrintInterface.print('rotate-left');
-            console.log("El jugador "+this.player+" ha rotado a la izquierda");
-            ConnectionHandler.socket.emit("rotatePlayer", { direction: "left", playerId: this.player });
-        });
-        document.getElementById('rotate-right').addEventListener('click', () => {
-           // PrintInterface.print('rotate-right');
-            console.log("El jugador "+this.player+" ha rotado a la derecha");
+        document.getElementById('rotate').addEventListener('click', () => {
+            console.log("El jugador " + this.player + " rota (horario)");
+            // Emitir "rotatePlayer" con dirección forzada a "right"
             ConnectionHandler.socket.emit("rotatePlayer", { direction: "right", playerId: this.player });
         });
-
-
+        document.getElementById('shoot').addEventListener('click', () => {
+            console.log("El jugador " + this.player + " ha disparado");
+            ConnectionHandler.socket.emit("shoot", { playerId: this.player });
+        });
         
 
     }
