@@ -57,12 +57,14 @@ export class ServerService {
                GameService.getInstance().movePlayer( data);
             });
 
+
             socket.on("shoot", (data) => {
                 console.log("Shoot", data);
             });
 
             socket.on("rotatePlayer", (data) => {
                 console.log("Rotate player", data);
+                GameService.getInstance().rotatePlayer(data);
             });
 
 

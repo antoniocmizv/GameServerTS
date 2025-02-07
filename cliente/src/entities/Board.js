@@ -61,6 +61,7 @@ export class Board {
         players.forEach(player => {
             if (player.visibility) {
                 board[player.x][player.y] = 2;
+
             }
         });
 
@@ -68,16 +69,25 @@ export class Board {
         boardContainer.innerHTML = '';
 
         // Agregar tablero
-        for (let i = 0; i < size; i++) {
+               for (let i = 0; i < size; i++) {
             const row = document.createElement('div');
             row.className = 'board-row';
             for (let j = 0; j < size; j++) {
                 const cell = document.createElement('div');
                 cell.className = 'board-cell';
-                if (board[i][j] === 1) {
+                // Verificamos si en esta celda hay un arbusto
+                const isBush = this.elements.some(bush => bush.x === i && bush.y === j);
+                // Verificamos si hay un jugador en esta celda
+                const matchingPlayer = players.find(player => player.x === i && player.y === j);
+                
+                if (isBush && matchingPlayer) {
+                    // Si hay un jugador dentro de un arbusto, aplicamos un estilo especial
+                    cell.classList.add('player-in-bush');
+                } else if (isBush) {
                     cell.classList.add('bush');
-                } else if (board[i][j] === 2) {
+                } else if (matchingPlayer) {
                     cell.classList.add('player');
+                    cell.classList.add(matchingPlayer.direction); // agrega la dirección, ejemplo 'up', 'down', etc.
                 }
                 row.appendChild(cell);
             }
