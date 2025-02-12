@@ -5,7 +5,7 @@ import { RoomService } from "../room/RoomService";
 import { Game, GameStates } from "./entities/Game";
 import { BoardBuilder } from "./BoardBuilder";
 import { ServerService } from "../server/ServerService";
-import { publicDecrypt } from "crypto";
+
 
 export class GameService {
     private games: Game[];
@@ -25,8 +25,7 @@ export class GameService {
 
 
 
-    // ...existing code...
-    private corners: [number, number][] = [];
+    public corners: [number, number][] = [];
 
     // Método para inicializar esquinas
     private initCorners(boardSize: number): void {
@@ -143,7 +142,15 @@ export class GameService {
             player.y = newY;
         }
 
-        ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+        // Verificar si quedo un único jugador vivo
+        if (this.checkGameOver(room)) {
+            // Se envía el mensaje de partida terminada
+            ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+        } else {
+            ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+        }
+
+        
     }
 
     public rotatePlayer(data: any) {
@@ -201,8 +208,22 @@ export class GameService {
             console.log(`Jugador ${targetPlayer.id.id} fue eliminado por ${shooter.id.id}`);
         }
 
-        // Notificar a todos los jugadores en la sala con la actualización del juego
-        ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+        if (this.checkGameOver(room)) {
+            ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+        } else {
+            ServerService.getInstance().sendMessageToRoom(room.name, this.serializeGame(room.game));
+        }
+    }
+
+    private checkGameOver(room: Room): boolean {
+        const alivePlayers = room.players.filter(p => p.state !== PlayerStates.Dead);
+        if (alivePlayers.length <= 1) {
+            // Actualizamos el estado del juego a END
+            if (room.game)
+                room.game.state = GameStates.ENDED;
+            return true;
+        }
+        return false;
     }
 
 

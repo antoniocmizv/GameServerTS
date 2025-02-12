@@ -9,11 +9,13 @@ export class GameService {
         PLAYING: 1,
         ENDED: 2
     };
-    #player = null;
+    player = null;
     #players = [];
     #board = null;
     #state = null;
     #actionsList = {};
+    #gameOverShown = false; // bandera para controlar el GameOver
+
 
     constructor() {
         this.#state = this.#states.WAITING
@@ -28,7 +30,7 @@ export class GameService {
 
     //setear el jugador actual
     setPlayer(player) {
-        this.#player = player;
+        this.player = player;
     }
 
     do(data) {
@@ -43,40 +45,56 @@ export class GameService {
         console.log(content);
         console.log("ha llegado un start");
         // Genero un nuevo tablero con los datos que llegan y lo imprimo
-        console.log("soy el jugador desde el gameService " + this.#player);
-        const boardInstance = new Board(content, this.#player);
+        console.log("soy el jugador desde el gameService " + this.player);
+        const boardInstance = new Board(content, this.player);
         boardInstance.print();
         boardInstance.printInHtml();
     };
 
+
+
     do_gameStart(content) {
         console.log("Iniciando juego con estado:", content);
-        const boardInstance = new Board(content.board, this.#player);
-        // Filtrar jugadores vivos
-        const alivePlayers = content.room.players.filter(player => player.state !== 4);
+        const boardInstance = new Board(content.board, this.player);
 
-        // Actualizar la lista de jugadores en el servicio
+        // Filtrar jugadores vivos (asumiendo que 4 representa Dead)
+        const alivePlayers = content.room.players.filter(player => player.state !== 4);
         this.#players = alivePlayers;
 
-        // Si el jugador actual está muerto, se puede ocultar la interfaz o notificar el fin
-        if (!alivePlayers.find(p => p.socketId === this.#player)) {
-            PrintInterface.showGameOver(); // Por ejemplo, mostrando un mensaje de "Game Over"
+        // Si el jugador actual está muerto y aún no se ha mostrado el mensaje
+        if (!alivePlayers.find(p => p.socketId === this.player)) {
+            if (!this.#gameOverShown) {
+                Board.showGameOver();
+                this.#gameOverShown = true;
+            }
             return;
         }
+
+        // Reiniciar la bandera si todavía está vivo
+        this.#gameOverShown = false;
+
+        // Si el estado del juego es ENDED, mostrar botón de reinicio solo una vez
+        if (content.state === 2) { // 2 representa ENDED
+            this.#state = this.#states.ENDED;
+            Board.showRestartButton();
+        }
+        
 
         boardInstance.print(alivePlayers);
         boardInstance.printInHtml(alivePlayers);
     }
-
-
-
-
-
-
-
-
-
-
-
+    /* ... */
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

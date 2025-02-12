@@ -4,6 +4,8 @@ import { Directions, Player, PlayerStates } from '../player/entities/Player';
 import { GameService } from '../game/GameService';
 import { BoardBuilder } from '../game/BoardBuilder';
 import { Room } from '../room/entities/Room';
+import { RoomService } from '../room/RoomService';
+import { GameStates } from '../game/entities/Game';
 
 export class ServerService {
     private io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> | null;
@@ -66,6 +68,52 @@ export class ServerService {
             socket.on("rotatePlayer", (data) => {
                 console.log("Rotate player", data);
                 GameService.getInstance().rotatePlayer(data);
+            });
+                       socket.on("restartGame", (data) => {
+                console.log("Restart game", data);
+                // 1. Obtener la sala del jugador
+                const room = RoomService.getInstance().getRoomByPlayerId(data.playerId);
+                if (!room) return;
+            
+                // 2. Reinicializar el estado del juego y de los jugadores
+                room.players.forEach(player => {
+                    player.state = PlayerStates.Idle;
+                    player.visibility = true;
+                });
+            
+                if (room.game) {
+                    console.log("Game restarted");
+                    room.game.board = new BoardBuilder().getBoard();
+                    room.game.state = GameStates.PLAYING;
+            
+                    // Validar que existan esquinas para asignar spawn points.
+                    const gameService = GameService.getInstance();
+                    if (!gameService.corners || gameService.corners.length === 0) {
+                        // Asignar esquinas por defecto en función del tamaño del tablero
+                        const size = room.game.board.size;
+                        gameService.corners = [
+                            [0, 0],
+                            [0, size - 1],
+                            [size - 1, 0],
+                            [size - 1, size - 1]
+                        ];
+                    }
+            
+                    room.players.forEach(player => {
+                        const randomIndex = Math.floor(Math.random() * gameService.corners.length);
+                        const spawn = gameService.corners[randomIndex];
+                        if (spawn) {
+                            const [spawnX, spawnY] = spawn;
+                            player.x = spawnX;
+                            player.y = spawnY;
+                        }
+                        // Reiniciar dirección a "Up"
+                        player.direction = Directions.Up;
+                    });
+            
+                    // Notificar a todos los clientes con el juego reiniciado
+                    ServerService.getInstance().sendMessageToRoom(room.name, gameService.serializeGame(room.game));
+                }
             });
 
 

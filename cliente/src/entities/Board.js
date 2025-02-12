@@ -123,4 +123,23 @@ export class Board {
         
 
     }
+
+    static showGameOver() {
+        // Mostrar mensaje "Game Over"
+        alert("Game Over");
+    }
+
+    static showRestartButton() {
+        // Mostrar botón de reinicio en algún contenedor
+        const container = document.getElementById('game-container');
+        const btn = document.createElement('button');
+        btn.innerText = "Reiniciar partida";
+        btn.addEventListener('click', () => {
+            // Emitir evento para reiniciar la partida
+            ConnectionHandler.socket.emit("restartGame", { playerId: ConnectionHandler.gameService.player });
+            // Limpiar contenedor
+            container.innerHTML = '';
+        });
+        container.appendChild(btn);
+    }
 }

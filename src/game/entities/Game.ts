@@ -2,7 +2,7 @@ import { Room } from "../../room/entities/Room";
 import { Board } from "./Board";
 
 export enum GameStates {
-    WAITING, PLAYING
+    WAITING, PLAYING,ENDED
 }
 
 export interface Game {
