@@ -8,24 +8,38 @@ export class BoardBuilder {
             type: "board",
             size: 10,
             elements: []
-        }
-        const map: Array<number[]> = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 5, 0, 0, 0],
-            [0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 5, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 5, 0],
-            [0, 0, 5, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 5, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ]
-        for (let i = 0; i < this.board.size; i++)
-            for (let j = 0; j < this.board.size; j++)
-                if (map[i][j] != 0) {
-                    this.board.elements.push({ x: i, y: j })
+        };
+
+        const size = this.board.size;
+        const bushProbability = 0.2; // Probabilidad de colocar un arbusto en una celda válida
+        // Iterar por todas las celdas del tablero
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                // Excluir las esquinas del tablero
+                if (
+                    (i === 0 && j === 0) ||
+                    (i === 0 && j === size - 1) ||
+                    (i === size - 1 && j === 0) ||
+                    (i === size - 1 && j === size - 1)
+                ) {
+                    continue;
                 }
+
+                // Verificar que no exista ya un arbusto en las celdas adyacentes (incluyendo la actual)
+                let canPlace = true;
+                for (const bush of this.board.elements) {
+                    if (Math.abs(bush.x - i) <= 1 && Math.abs(bush.y - j) <= 1) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+
+                // Si se puede colocar y se supera la probabilidad, agregar el arbusto
+                if (canPlace && Math.random() < bushProbability) {
+                    this.board.elements.push({ x: i, y: j });
+                }
+            }
+        }
     }
 
     public getBoard(): Board {
@@ -42,8 +56,6 @@ export class BoardBuilder {
                     y: element.y
                 }))
             }
-
-
         };
     }
 }

@@ -1,7 +1,5 @@
 import { Board } from "../entities/Board.js";
-import { Player } from "../entities/Player.js";
-import { PrintInterface } from "../interfaces/PrintInterface.js";
-import { ConnectionHandler } from "./ConectionHandler.js";
+import {Ui} from "../views/Ui.js";
 
 export class GameService {
     #states = {
@@ -31,6 +29,8 @@ export class GameService {
     //setear el jugador actual
     setPlayer(player) {
         this.player = player;
+        //lo añado al array de jugadores
+        this.#players.push(player);
     }
 
     do(data) {
@@ -46,9 +46,14 @@ export class GameService {
         console.log("ha llegado un start");
         // Genero un nuevo tablero con los datos que llegan y lo imprimo
         console.log("soy el jugador desde el gameService " + this.player);
+     
+       
+
+
         const boardInstance = new Board(content, this.player);
-        boardInstance.print();
-        boardInstance.printInHtml();
+        boardInstance.print(); // Puedes dejar la representación por consola
+        const boardView = new Ui(content,this.#players, this.player);
+        boardView.renderBoard();
     };
 
 
@@ -56,32 +61,33 @@ export class GameService {
     do_gameStart(content) {
         console.log("Iniciando juego con estado:", content);
         const boardInstance = new Board(content.board, this.player);
-
+        const ui = new Ui(content.board, content.room.players, this.player);
+    
         // Filtrar jugadores vivos (asumiendo que 4 representa Dead)
         const alivePlayers = content.room.players.filter(player => player.state !== 4);
         this.#players = alivePlayers;
-
-        // Si el jugador actual está muerto y aún no se ha mostrado el mensaje
-        if (!alivePlayers.find(p => p.socketId === this.player)) {
+    
+        // Comprobar si el jugador actual está vivo
+        let controlsEnabled = true;
+        const currentAlive = alivePlayers.find(p => p.socketId === this.player);
+        if (!currentAlive) {
+            controlsEnabled = false;
             if (!this.#gameOverShown) {
-                Board.showGameOver();
+                Ui.showGameOver();
                 this.#gameOverShown = true;
             }
-            return;
+        } else {
+            // Reiniciar la bandera si el jugador está vivo
+            this.#gameOverShown = false;
         }
-
-        // Reiniciar la bandera si todavía está vivo
-        this.#gameOverShown = false;
-
-        // Si el estado del juego es ENDED, mostrar botón de reinicio solo una vez
+    
+        // Si el estado del juego es ENDED, mostrar botón de reinicio
         if (content.state === 2) { // 2 representa ENDED
             this.#state = this.#states.ENDED;
-            Board.showRestartButton();
+            Ui.showRestartButton();
         }
         
-
-        boardInstance.print(alivePlayers);
-        boardInstance.printInHtml(alivePlayers);
+        ui.renderBoard(alivePlayers, controlsEnabled);
     }
     /* ... */
 }

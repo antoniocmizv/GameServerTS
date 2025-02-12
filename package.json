@@ -11,7 +11,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongoose": "^8.9.3",
     "proyecto-base-ts": "file:",
     "socket.io": "^4.8.1"
   },

@@ -70,12 +70,12 @@ export class ServerService {
                 GameService.getInstance().rotatePlayer(data);
             });
                        socket.on("restartGame", (data) => {
-                console.log("Restart game", data);
-                // 1. Obtener la sala del jugador
                 const room = RoomService.getInstance().getRoomByPlayerId(data.playerId);
                 if (!room) return;
-            
-                // 2. Reinicializar el estado del juego y de los jugadores
+                const requestingPlayer = room.players.find(player => player.id.id === data.playerId);
+                // Solo procesar si el jugador está vivo
+                if (!requestingPlayer || requestingPlayer.state === PlayerStates.Dead) return;
+                
                 room.players.forEach(player => {
                     player.state = PlayerStates.Idle;
                     player.visibility = true;
@@ -85,11 +85,8 @@ export class ServerService {
                     console.log("Game restarted");
                     room.game.board = new BoardBuilder().getBoard();
                     room.game.state = GameStates.PLAYING;
-            
-                    // Validar que existan esquinas para asignar spawn points.
                     const gameService = GameService.getInstance();
                     if (!gameService.corners || gameService.corners.length === 0) {
-                        // Asignar esquinas por defecto en función del tamaño del tablero
                         const size = room.game.board.size;
                         gameService.corners = [
                             [0, 0],
@@ -98,20 +95,35 @@ export class ServerService {
                             [size - 1, size - 1]
                         ];
                     }
-            
                     room.players.forEach(player => {
                         const randomIndex = Math.floor(Math.random() * gameService.corners.length);
                         const spawn = gameService.corners[randomIndex];
                         if (spawn) {
                             const [spawnX, spawnY] = spawn;
-                            player.x = spawnX;
-                            player.y = spawnY;
+                            // Check if any other player is already at this position
+                            const isPositionTaken = room.players.some(p => 
+                                p.id !== player.id && p.x === spawnX && p.y === spawnY
+                            );
+                            
+                            if (!isPositionTaken) {
+                                player.x = spawnX;
+                                player.y = spawnY;
+                            } else {
+                                // Try to find another available corner
+                                const availableCorner = gameService.corners.find(([x, y]) => 
+                                    !room.players.some(p => p.x === x && p.y === y)
+                                );
+                                if (availableCorner) {
+                                    player.x = availableCorner[0];
+                                    player.y = availableCorner[1];
+                                }
+                            }
                         }
-                        // Reiniciar dirección a "Up"
                         player.direction = Directions.Up;
                     });
-            
-                    // Notificar a todos los clientes con el juego reiniciado
+
+
+                   
                     ServerService.getInstance().sendMessageToRoom(room.name, gameService.serializeGame(room.game));
                 }
             });

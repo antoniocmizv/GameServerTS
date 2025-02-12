@@ -1,6 +1,6 @@
 import { io } from "../../node_modules/socket.io-client/dist/socket.io.esm.min.js";
 import { GameService } from "./GameService.js";
-import { PrintInterface } from "../interfaces/PrintInterface.js";
+
 export const ConnectionHandler = {
 
     connected: false,
