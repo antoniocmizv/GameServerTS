@@ -1,5 +1,5 @@
 import { Board } from "../entities/Board.js";
-import {Ui} from "../views/Ui.js";
+import { Ui } from "../views/Ui.js";
 
 export class GameService {
     #states = {
@@ -46,14 +46,7 @@ export class GameService {
         console.log("ha llegado un start");
         // Genero un nuevo tablero con los datos que llegan y lo imprimo
         console.log("soy el jugador desde el gameService " + this.player);
-     
-       
 
-
-        const boardInstance = new Board(content, this.player);
-        boardInstance.print(); // Puedes dejar la representación por consola
-        const boardView = new Ui(content,this.#players, this.player);
-        boardView.renderBoard();
     };
 
 
@@ -62,11 +55,11 @@ export class GameService {
         console.log("Iniciando juego con estado:", content);
         const boardInstance = new Board(content.board, this.player);
         const ui = new Ui(content.board, content.room.players, this.player);
-    
+
         // Filtrar jugadores vivos (asumiendo que 4 representa Dead)
         const alivePlayers = content.room.players.filter(player => player.state !== 4);
         this.#players = alivePlayers;
-    
+
         // Comprobar si el jugador actual está vivo
         let controlsEnabled = true;
         const currentAlive = alivePlayers.find(p => p.socketId === this.player);
@@ -80,13 +73,16 @@ export class GameService {
             // Reiniciar la bandera si el jugador está vivo
             this.#gameOverShown = false;
         }
-    
+
         // Si el estado del juego es ENDED, mostrar botón de reinicio
         if (content.state === 2) { // 2 representa ENDED
             this.#state = this.#states.ENDED;
-            Ui.showRestartButton();
+            // Mostrar restartButton solo si el jugador actual es el último vivo
+            if (alivePlayers.length === 1 && alivePlayers[0].socketId === this.player) {
+                Ui.showRestartButton();
+            }
         }
-        
+
         ui.renderBoard(alivePlayers, controlsEnabled);
     }
     /* ... */

@@ -5,6 +5,7 @@ import { RoomService } from "../room/RoomService";
 import { Game, GameStates } from "./entities/Game";
 import { BoardBuilder } from "./BoardBuilder";
 import { ServerService } from "../server/ServerService";
+import { GameMapper } from "./mappers/GameMapper";
 
 
 export class GameService {
@@ -233,32 +234,33 @@ export class GameService {
             name: room.name,
             occupied: room.occupied,
             players: room.players.map(player => ({
-                socketId: player.id.id,  // Aquí usamos el id real del socket
+                socketId: player.id.id,  
                 x: player.x,
                 y: player.y,
                 state: player.state,
                 direction: player.direction,
                 visibility: player.visibility
             }))
-            // Omitimos "game" para evitar la referencia circular
+            
         };
     }
 
     public serializeGame(game: Game): any {
-        return {
-            type: "game",
-            content: {
-                id: game.id,
-                state: game.state,
-                room: this.serializeRoom(game.room),
-                board: {
-                    type: game.board.type,
-                    size: game.board.size,
-                    elements: game.board.elements
-                }
-            }
+        // return {
+        //     type: "game",
+        //     content: {
+        //         id: game.id,
+        //         state: game.state,
+        //         room: this.serializeRoom(game.room),
+        //         board: {
+        //             type: game.board.type,
+        //             size: game.board.size,
+        //             elements: game.board.elements
+        //         }
+        //     }
 
-        };
+        // };
+         return GameMapper.mapGame(game);
     }
 
 }
